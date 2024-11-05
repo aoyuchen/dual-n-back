@@ -16,6 +16,7 @@ export default class Grid extends LitElement {
         .grid-container {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
             width: 600px;
             height: 600px;
         }
@@ -27,7 +28,6 @@ export default class Grid extends LitElement {
             font-size: 50px;
             border: 1px solid black;
             overflow: hidden;
-            height: 200px;
         }
 
         #p1 {

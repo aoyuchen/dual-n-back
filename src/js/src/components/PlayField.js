@@ -24,6 +24,26 @@ export default class PlayField extends LitElement {
         .play-field-container {
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header {
+            margin: 5px;
+        }
+
+        .grid {
+            margin: 5px;
+        }
+
+        .controls {
+            margin: 5px;
+        }
+
+        .pos-control,
+        .audio-control {
+            margin-left: 5px;
+            margin-right: 5px;
         }
     `;
 
@@ -73,9 +93,11 @@ export default class PlayField extends LitElement {
     }
 
     #renderHeader() {
-        return html`<button @click=${this.#handleStart}>
-            ${this._started ? 'cancel' : 'start'}
-        </button>`;
+        return html`<div class="header">
+            <button @click=${this.#handleStart}>
+                ${this._started ? 'cancel' : 'start'}
+            </button>
+        </div>`;
     }
 
     #handleStart() {
@@ -93,6 +115,7 @@ export default class PlayField extends LitElement {
         const curr = this._index;
         const prev = curr - this.#n;
 
+        let posCorrect, audioCorrect;
         // When should the pos button show red?
         if (
             (this._index < this.#n && this._posKeyPressed) ||
@@ -101,10 +124,10 @@ export default class PlayField extends LitElement {
             (this.#positions[curr] !== this.#positions[prev] &&
                 this._posKeyPressed)
         ) {
-            this.#numWrong++;
+            posCorrect = false;
             posBtn.style.borderColor = 'red';
         } else {
-            this.#numCorrect++;
+            posCorrect = true;
             posBtn.style.borderColor = 'green';
         }
 
@@ -114,12 +137,20 @@ export default class PlayField extends LitElement {
             (this.#arr[curr] === this.#arr[prev] && !this._audioKeyPressed) ||
             (this.#arr[curr] !== this.#arr[prev] && this._audioKeyPressed)
         ) {
-            this.#numWrong++;
+            audioCorrect = false;
             audioBtn.style.borderColor = 'red';
         } else {
-            this.#numCorrect++;
+            audioCorrect = true;
             audioBtn.style.borderColor = 'green';
         }
+
+        if (audioCorrect && posCorrect) {
+            this.#numCorrect++;
+        } else {
+            this.#numWrong++;
+        }
+
+        console.log(`numCorrect: ${this.#numCorrect}`);
     }
 
     #startGame() {
@@ -139,6 +170,8 @@ export default class PlayField extends LitElement {
 
     #endGame() {
         // end game
+        const result = this.#numCorrect / this.#iterNum;
+        console.log(`Correct rate: ${result * 100}%`);
 
         // First pause the audio
         const audio = document.getElementById('audioPlayer');
@@ -152,17 +185,22 @@ export default class PlayField extends LitElement {
     }
 
     #renderGrid() {
-        return html`<ac-grid
-            .index=${this._index}
-            .arr=${this.#arr}
-            .positions=${this.#positions}
-        ></ac-grid>`;
+        return html`<div class="grid">
+            <ac-grid
+                .index=${this._index}
+                .arr=${this.#arr}
+                .positions=${this.#positions}
+            ></ac-grid>
+        </div>`;
     }
 
     #renderControls() {
-        return html`<button class="pos-control">Position[F]</button
-            ><button class="audio-control">Audio[J]</button>
-            <div>Keydown result: ${this._keydownResult}</div>`;
+        return html`<div class="controls">
+            <div>
+                <button class="pos-control">Position[F]</button
+                ><button class="audio-control">Audio[J]</button>
+            </div>
+        </div>`;
     }
 
     #handleKeyDown(e) {
@@ -229,23 +267,23 @@ customElements.define('ac-play-field', PlayField);
 
 function getLetters(len) {
     //const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    /*const letterPool = 'KRQSL';
+    const letterPool = 'KRQSL';
     const results = [];
     for (let i = 0; i < len; i++) {
         results.push(letterPool[generateRandNum(0, letterPool.length - 1)]);
     }
     console.log(`letters: ${results}`);
-    return results;*/
-    return 'RLRRRRQQ';
+    return results;
+    //return 'RLRRRRQQ';
 }
 
 function getPositions(len) {
-    /*const numPool = '123456789';
+    const numPool = '123456789';
     const results = [];
     for (let i = 0; i < len; i++) {
         results.push(numPool[generateRandNum(0, numPool.length - 1)]);
     }
     console.log(`positions: ${results}`);
-    return results;*/
-    return '84666679';
+    return results;
+    //return '84666679';
 }
