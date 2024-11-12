@@ -104,11 +104,12 @@ export default class PlayField extends LitElement {
     }
 
     #renderHeader() {
-        return html`<div class="header">
-            <button @click=${this.#handleStart}>
-                ${this._started ? 'cancel' : 'start'}
-            </button>
-        </div>`;
+        return html`<h1>Welcome to The Dual N-Back Game!</h1>
+            <div class="header">
+                <button @click=${this.#handleStart}>
+                    ${this._started ? 'cancel' : 'start'}
+                </button>
+            </div>`;
     }
 
     #handleStart() {
@@ -208,10 +209,23 @@ export default class PlayField extends LitElement {
     #renderControls() {
         return html`<div class="controls">
             <div>
-                <button class="pos-control">Position[F]</button
-                ><button class="audio-control">Audio[J]</button>
+                <button class="pos-control" @click=${this.#posBtnClicked}>
+                    Position[F]</button
+                ><button class="audio-control" @click=${this.#audioBtnClicked}>
+                    Audio[J]
+                </button>
             </div>
         </div>`;
+    }
+
+    #posBtnClicked(e) {
+        this._posKeyPressed = true;
+        e.target.style.backgroundColor = 'yellow';
+    }
+
+    #audioBtnClicked(e) {
+        this._audioKeyPressed = true;
+        e.target.style.backgroundColor = 'yellow';
     }
 
     #handleKeyDown(e) {
