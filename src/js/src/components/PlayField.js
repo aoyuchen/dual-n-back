@@ -209,9 +209,17 @@ export default class PlayField extends LitElement {
     #renderControls() {
         return html`<div class="controls">
             <div>
-                <button class="pos-control" @click=${this.#posBtnClicked}>
+                <button
+                    class="pos-control"
+                    @click=${this.#posBtnClicked}
+                    @touchstart=${this.#posBtnClicked}
+                >
                     Position[F]</button
-                ><button class="audio-control" @click=${this.#audioBtnClicked}>
+                ><button
+                    class="audio-control"
+                    @click=${this.#audioBtnClicked}
+                    @touchstart=${this.#audioBtnClicked}
+                >
                     Audio[J]
                 </button>
             </div>
