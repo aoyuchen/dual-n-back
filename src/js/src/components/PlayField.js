@@ -1,16 +1,17 @@
 import { LitElement, html, css } from 'lit';
 import { delay } from '../helper/delay';
-import { generateRandNum } from '../helper/random';
+import { randomNormal } from 'd3-random';
+import { generateRandNum, generatePermutation } from '../helper/random';
 import './Grid';
 
 export default class PlayField extends LitElement {
     #arr = [];
     #positions = [];
-    #iterNum = 8; // number of letters in one game
+    #iterNum = 14; // number of letters in one game
     #n = 2; // the n in dual-n-back
     #numCorrect = 0;
     #numWrong = 0;
-    #delay = 2000;
+    #delay = 1000;
 
     static properties = {
         _started: { state: true },
@@ -21,6 +22,16 @@ export default class PlayField extends LitElement {
     };
 
     static styles = css`
+        :host {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('src/js/resources/images/thanksgiving-vibe.jpg'); /* Path to your image */
+            background-size: cover; /* Scale image to cover entire screen */
+            background-repeat: no-repeat; /* Prevent tiling */
+            background-position: center; /* Center the image */
+        }
+
         .play-field-container {
             display: flex;
             flex-direction: column;
@@ -266,7 +277,6 @@ export default class PlayField extends LitElement {
 customElements.define('ac-play-field', PlayField);
 
 function getLetters(len) {
-    //const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const letterPool = 'KRQSL';
     const results = [];
     for (let i = 0; i < len; i++) {
@@ -274,16 +284,28 @@ function getLetters(len) {
     }
     console.log(`letters: ${results}`);
     return results;
-    //return 'RLRRRRQQ';
 }
 
 function getPositions(len) {
-    const numPool = '123456789';
+    const numPool = generatePermutation();
+    console.log(`permutation: ${numPool}`);
     const results = [];
     for (let i = 0; i < len; i++) {
-        results.push(numPool[generateRandNum(0, numPool.length - 1)]);
+        const idx = getRandomIndex();
+        console.log(`random idx is: ${idx}`);
+        results.push(numPool[idx]);
     }
     console.log(`positions: ${results}`);
     return results;
-    //return '84666679';
+}
+
+function getRandomIndex() {
+    const idx = Math.round(randomNormal(5, 2)());
+    if (idx < 0) {
+        return 0;
+    }
+    if (idx > 8) {
+        return 8;
+    }
+    return idx;
 }
