@@ -36,25 +36,36 @@ export default class PlayField extends LitElement {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
+            justify-content: start;
+            width: 100%;
+            height: 100%;
         }
 
         .header {
-            margin: 5px;
+            margin: 25px;
         }
 
         .grid {
-            margin: 5px;
+            margin: 25px;
+            width: 50%;
+            aspect-ratio: 1/1;
+            max-width: 600px;
+            min-width: 300px;
+            border: 1px solid black;
         }
 
         .controls {
-            margin: 5px;
+            margin: 25px;
         }
 
         .pos-control,
-        .audio-control {
-            margin-left: 5px;
-            margin-right: 5px;
+        .audio-control,
+        .start-btn {
+            margin-left: 15px;
+            margin-right: 15px;
+            height: 35px;
+            width: 85px;
+            border-radius: 15px;
         }
     `;
 
@@ -106,8 +117,8 @@ export default class PlayField extends LitElement {
     #renderHeader() {
         return html`<h1>Welcome to The Dual N-Back Game!</h1>
             <div class="header">
-                <button @click=${this.#handleStart}>
-                    ${this._started ? 'cancel' : 'start'}
+                <button class="start-btn" @click=${this.#handleStart}>
+                    ${this._started ? 'Cancel' : 'Start'}
                 </button>
             </div>`;
     }
@@ -214,13 +225,13 @@ export default class PlayField extends LitElement {
                     @click=${this.#posBtnClicked}
                     @touchstart=${this.#posBtnClicked}
                 >
-                    Position[F]</button
+                    Position [F]</button
                 ><button
                     class="audio-control"
                     @click=${this.#audioBtnClicked}
                     @touchstart=${this.#audioBtnClicked}
                 >
-                    Audio[J]
+                    Audio [J]
                 </button>
             </div>
         </div>`;
@@ -322,7 +333,7 @@ function getPositions(len) {
 }
 
 function getRandomIndex() {
-    const idx = Math.round(randomNormal(5, 2)());
+    const idx = Math.round(randomNormal(5, 1)());
     if (idx < 0) {
         return 0;
     }

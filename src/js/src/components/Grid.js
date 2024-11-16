@@ -17,8 +17,8 @@ export default class Grid extends LitElement {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            width: 600px;
-            height: 600px;
+            width: 100%;
+            height: 100%;
         }
 
         .grid-item {
@@ -70,11 +70,19 @@ export default class Grid extends LitElement {
     async willUpdate(changedProperties) {
         if (changedProperties.has('index') && this.#updateCharAndPos()) {
             const gridItem = this.shadowRoot.getElementById(gridId(this.#pos));
-            gridItem.style.backgroundColor = 'red';
-            gridItem.innerHTML = this.#ch;
+            //gridItem.style.backgroundColor = 'orange';
+            gridItem.style.backgroundImage = `url(
+                'src/js/resources/images/cute-santa.jpg'
+            )`; /* Path to your image */
+            gridItem.style.backgroundRepeat = 'no-repeat';
+            gridItem.style.backgroundSize = 'cover';
+            gridItem.style.backgroundPosition = 'center';
+
+            //gridItem.innerHTML = this.#ch;
             await delay(500);
-            gridItem.style.backgroundColor = '';
-            gridItem.innerHTML = '';
+            //gridItem.style.backgroundColor = '';
+            gridItem.style.backgroundImage = '';
+            //gridItem.innerHTML = '';
         }
     }
 
