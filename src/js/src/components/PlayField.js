@@ -42,14 +42,15 @@ export default class PlayField extends LitElement {
         }
 
         .header {
-            margin: 25px;
+            margin-top: 5px;
+            margin-bottom: 20px;
         }
 
         .grid {
             margin: 25px;
             width: 50%;
             aspect-ratio: 1/1;
-            max-width: 600px;
+            max-width: 500px;
             min-width: 300px;
             border: 1px solid black;
         }
@@ -64,8 +65,10 @@ export default class PlayField extends LitElement {
             margin-left: 15px;
             margin-right: 15px;
             height: 35px;
-            width: 85px;
+            width: 100px;
             border-radius: 15px;
+            border-width: 4px;
+            border-color: yellow;
         }
     `;
 
@@ -115,7 +118,11 @@ export default class PlayField extends LitElement {
     }
 
     #renderHeader() {
-        return html`<h1>Welcome to The Dual N-Back Game!</h1>
+        return html`<h1
+                style="font-family: 'Mountains of Christmas', cursive; font-size: 60px; color: rgba(255, 105, 0, 0.7)"
+            >
+                Welcome to The Dual N-Back Game!
+            </h1>
             <div class="header">
                 <button class="start-btn" @click=${this.#handleStart}>
                     ${this._started ? 'Cancel' : 'Start'}
