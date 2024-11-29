@@ -3,15 +3,16 @@ import { delay } from '../helper/delay';
 import { randomNormal } from 'd3-random';
 import { generateRandNum, generatePermutation } from '../helper/random';
 import './Grid';
+import './Settings';
 
 export default class PlayField extends LitElement {
     #arr = [];
     #positions = [];
     #iterNum = 14; // number of letters in one game
-    #n = 2; // the n in dual-n-back
     #numCorrect = 0;
     #numWrong = 0;
     #delay = 1000;
+    #settings;
 
     static properties = {
         _started: { state: true },
@@ -42,8 +43,11 @@ export default class PlayField extends LitElement {
         }
 
         .header {
+            display: flex;
             margin-top: 5px;
             margin-bottom: 20px;
+            align-items: center;
+            justify-content: end;
         }
 
         .grid {
@@ -68,7 +72,52 @@ export default class PlayField extends LitElement {
             width: 100px;
             border-radius: 15px;
             border-width: 4px;
-            border-color: yellow;
+            border-color: orange;
+        }
+
+        /* Modal overlay */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(
+                0,
+                0,
+                0,
+                0.5
+            ); /* Semi-transparent background */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        /* Modal content box */
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Close button */
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .close:hover {
+            color: red;
         }
     `;
 
@@ -99,6 +148,13 @@ export default class PlayField extends LitElement {
         });
 
         document.addEventListener('keydown', (e) => this.#handleKeyDown(e));
+
+        // default settings
+        this.#settings = {
+            N: 2, // the n in dual-n-back
+            totalIterations: 18, // number of letters in one game
+            delay: 1000, // delay before the answer is evaluated
+        };
     }
 
     willUpdate(changedProperties) {
@@ -112,9 +168,28 @@ export default class PlayField extends LitElement {
 
     render() {
         return html`<div class="play-field-container">
-            ${this.#renderHeader()} ${this.#renderGrid()}
-            ${this.#renderControls()}
-        </div>`;
+                ${this.#renderHeader()} ${this.#renderGrid()}
+                ${this.#renderControls()}
+            </div>
+            <div id="modal" class="modal">
+                <div class="modal-content">
+                    <span class="close" @click=${this.#closeModal}
+                        >&times;</span
+                    >
+                    <h2>Results:</h2>
+                    <p>${(100 * this.#numCorrect) / this.#iterNum}%</p>
+                </div>
+            </div>`;
+    }
+
+    #openModal() {
+        const modal = this.shadowRoot.getElementById('modal');
+        modal.style.display = 'flex';
+    }
+
+    #closeModal() {
+        const modal = this.shadowRoot.getElementById('modal');
+        modal.style.display = 'none';
     }
 
     #renderHeader() {
@@ -127,6 +202,7 @@ export default class PlayField extends LitElement {
                 <button class="start-btn" @click=${this.#handleStart}>
                     ${this._started ? 'Cancel' : 'Start'}
                 </button>
+                <ac-settings .settings=${this.#settings}></ac-settings>
             </div>`;
     }
 
@@ -143,12 +219,12 @@ export default class PlayField extends LitElement {
         const audioBtn = this.shadowRoot.querySelector('.audio-control');
 
         const curr = this._index;
-        const prev = curr - this.#n;
+        const prev = curr - this.#settings.N;
 
         let posCorrect, audioCorrect;
         // When should the pos button show red?
         if (
-            (this._index < this.#n && this._posKeyPressed) ||
+            (this._index < this.#settings.N && this._posKeyPressed) ||
             (this.#positions[curr] === this.#positions[prev] &&
                 !this._posKeyPressed) ||
             (this.#positions[curr] !== this.#positions[prev] &&
@@ -163,7 +239,7 @@ export default class PlayField extends LitElement {
 
         // When should the audio button show red?
         if (
-            (this._index < this.#n && this._audioKeyPressed) ||
+            (this._index < this.#settings.N && this._audioKeyPressed) ||
             (this.#arr[curr] === this.#arr[prev] && !this._audioKeyPressed) ||
             (this.#arr[curr] !== this.#arr[prev] && this._audioKeyPressed)
         ) {
@@ -193,6 +269,7 @@ export default class PlayField extends LitElement {
         this.#numWrong = 0;
 
         console.log('game started!');
+        console.log(`N is: ${this.#settings.N}`);
         this.#arr = getLetters(this.#iterNum);
         this.#positions = getPositions(this.#iterNum);
         this.#playAudio();
@@ -212,6 +289,7 @@ export default class PlayField extends LitElement {
         // Clear control color
         this.#clearControls();
         console.log('game ended!');
+        this.#openModal();
     }
 
     #renderGrid() {

@@ -73,7 +73,3 @@ export default class Header extends LitElement {
 }
 
 customElements.define('ac-header', Header);
-
-function getLetters() {
-    return 'BCDEF';
-}
