@@ -4,11 +4,11 @@ import { randomNormal } from 'd3-random';
 import { generateRandNum, generatePermutation } from '../helper/random';
 import './Grid';
 import './Settings';
+import './Modal';
 
 export default class PlayField extends LitElement {
     #arr = [];
     #positions = [];
-    #iterNum = 14; // number of letters in one game
     #numCorrect = 0;
     #numWrong = 0;
     #delay = 1000;
@@ -75,49 +75,10 @@ export default class PlayField extends LitElement {
             border-color: orange;
         }
 
-        /* Modal overlay */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(
-                0,
-                0,
-                0,
-                0.5
-            ); /* Semi-transparent background */
-            justify-content: center;
+        .results {
+            display: flex;
             align-items: center;
-            z-index: 1000;
-        }
-
-        /* Modal content box */
-        .modal-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-        }
-
-        /* Close button */
-        .close {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            color: #333;
-        }
-
-        .close:hover {
-            color: red;
+            justify-content: center;
         }
     `;
 
@@ -152,7 +113,7 @@ export default class PlayField extends LitElement {
         // default settings
         this.#settings = {
             N: 2, // the n in dual-n-back
-            totalIterations: 18, // number of letters in one game
+            totalIterations: 10, // number of letters in one game
             delay: 1000, // delay before the answer is evaluated
         };
     }
@@ -168,28 +129,25 @@ export default class PlayField extends LitElement {
 
     render() {
         return html`<div class="play-field-container">
-                ${this.#renderHeader()} ${this.#renderGrid()}
-                ${this.#renderControls()}
-            </div>
-            <div id="modal" class="modal">
-                <div class="modal-content">
-                    <span class="close" @click=${this.#closeModal}
-                        >&times;</span
-                    >
-                    <h2>Results:</h2>
-                    <p>${(100 * this.#numCorrect) / this.#iterNum}%</p>
-                </div>
-            </div>`;
+            ${this.#renderHeader()} ${this.#renderGrid()}
+            ${this.#renderControls()}
+            <ac-modal id="result-dialog"
+                ><div class="results">
+                    <h2>
+                        Results:
+                        ${(
+                            (100 * this.#numCorrect) /
+                            this.#settings.totalIterations
+                        ).toFixed(1)}%
+                    </h2>
+                </div></ac-modal
+            >
+        </div> `;
     }
 
     #openModal() {
-        const modal = this.shadowRoot.getElementById('modal');
-        modal.style.display = 'flex';
-    }
-
-    #closeModal() {
-        const modal = this.shadowRoot.getElementById('modal');
-        modal.style.display = 'none';
+        const modal = this.shadowRoot.getElementById('result-dialog');
+        modal.open = true;
     }
 
     #renderHeader() {
@@ -270,14 +228,14 @@ export default class PlayField extends LitElement {
 
         console.log('game started!');
         console.log(`N is: ${this.#settings.N}`);
-        this.#arr = getLetters(this.#iterNum);
-        this.#positions = getPositions(this.#iterNum);
+        this.#arr = getLetters(this.#settings.totalIterations);
+        this.#positions = getPositions(this.#settings.totalIterations);
         this.#playAudio();
     }
 
     #endGame() {
         // end game
-        const result = this.#numCorrect / this.#iterNum;
+        const result = this.#numCorrect / this.#settings.totalIterations;
         console.log(`Correct rate: ${result * 100}%`);
 
         // First pause the audio
